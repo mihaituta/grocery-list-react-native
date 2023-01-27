@@ -1,19 +1,15 @@
 # Grocery list react native
-A **grocery shopping** application I made to **learn react** and to use for myself when I go shopping.
+I remade my **<a href="https://github.com/mihaituta/Grocery-list" rel="noreferrer" target="_blank">Grocery shopping</a>** application in **react native** to use it as an android application as well.
 
 <a href="https://shopping-mt.netlify.app" rel="noreferrer" target="_blank">Live demo</a> for the web version or go to **Installation** section for mobile.
 
 **Demo** account **demo@gmail.com**, password: **123123**
 
-
 # Technologies
-- **React.js**
-- **HTML**
-- **CSS**
-- **JavaScript**
+
+- **React Native**
 - **Tailwind CSS**
 - **Firebase**
-- Hosted on **Netlify**
 
 # Functionalities
 Users have to create an account to have their data saved in the database.

@@ -13,7 +13,6 @@ import {
 
 import { StatusBar } from 'expo-status-bar'
 import { ListsContextProvider } from './src/components/List/ListsContextProvider'
-import * as SplashScreen from 'expo-splash-screen'
 
 function AppContent() {
   const Stack = createNativeStackNavigator()
@@ -24,8 +23,8 @@ function AppContent() {
 
   const options = {
     headerShown: false,
-    presentation: 'modal',
-    animationTypeForReplace: 'push',
+    /*    presentation: 'modal',
+    animationTypeForReplace: 'push',*/
     animation: 'slide_from_right',
   }
 

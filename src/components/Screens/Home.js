@@ -1,19 +1,15 @@
 import {
   ActivityIndicator,
-  Button,
   FlatList,
   Pressable,
   RefreshControl,
-  SafeAreaView,
-  ScrollView,
   Text,
-  TouchableOpacity,
   View,
 } from 'react-native'
 import BouncyCheckbox from 'react-native-bouncy-checkbox'
 
 import { StatusBar } from 'expo-status-bar'
-import React, { useContext, useEffect, useLayoutEffect } from 'react'
+import React, { useContext } from 'react'
 import Header from '../Layout/Header'
 import { UserAuth } from '../Auth/AuthContext'
 import { ListsContext } from '../List/ListsContextProvider'
@@ -82,6 +78,7 @@ const Home = ({ navigation }) => {
       <FlatList
         data={listsCtx.lists}
         stickyHeaderIndices={[0]}
+        // HEADER
         ListHeaderComponent={
           <Header buttonText='Logout' buttonFunction={handleLogout}>
             <Pressable
@@ -94,6 +91,7 @@ const Home = ({ navigation }) => {
             </Pressable>
           </Header>
         }
+        // REFRESH
         refreshControl={
           <RefreshControl
             progressBackgroundColor={'#18181B'}
@@ -105,14 +103,15 @@ const Home = ({ navigation }) => {
         }
         className='flex-1'
         numColumns={2}
+        // EMPTY COMPONENT
         ListEmptyComponent={emptyComponent}
+        // LIST CARD
         renderItem={(list) => (
           <Pressable
             android_ripple={{ color: `rgb(252, 211, 77)` }}
             className={`h-28 flex-1 max-w-[43%] my-2.5  ${
-              list.index % 2 === 0 ? 'mr-2.5 ml-4 ' : 'ml-2.5 mr-4 '
-            } bg-zinc-800 rounded list-none cursor-pointer
-              overflow-ellipsis overflow-hidden relative  `}
+              list.index % 2 === 0 ? 'mr-2.5 ml-4' : 'ml-2.5 mr-4'
+            } bg-zinc-800 rounded list-none relative`}
             style={{
               shadowColor: 'rgb(0, 0, 0)',
               shadowOffset: {
@@ -126,29 +125,32 @@ const Home = ({ navigation }) => {
             }}
             onPress={() => listRedirect(list.item)}
           >
-            <View className='text-neutral-400 px-2 py-1 h-4/6 overflow-hidden overflow-ellipsis'>
+            {/*ITEMS PREVIEW*/}
+            <View className='text-neutral-400 px-2 py-1 h-4/6 mr-2'>
               {list.item.foodItems &&
                 list.item.foodItems.map((item, index) => (
                   <BouncyCheckbox
                     fillColor={'#FBBF24'}
-                    className='pb-0.5'
-                    textStyle={{
-                      textDecorationLine: 'none',
-                      color: 'rgb(163,163,163)',
-                    }}
-                    textContainerStyle={{
-                      marginLeft: 8,
-                      flex: 1,
-                    }}
+                    className='pb-1'
+                    innerIconStyle={{ borderWidth: 1.5 }}
                     disabled
                     isChecked={item.checked}
                     disableBuiltInState
-                    size={16}
+                    size={15}
                     key={item.id}
-                    text={item.name + (index === 2 ? '...' : '')}
+                    textComponent={
+                      <Text
+                        numberOfLines={1}
+                        className='ml-2 text-neutral-400 text-md'
+                      >
+                        {item.name + (index === 2 ? '...' : '')}
+                      </Text>
+                    }
                   />
                 ))}
             </View>
+
+            {/*LIST DATE*/}
             <Text className='text-amber-300 text-md absolute right-3 bottom-2.5'>
               {formattedDate(list.item.date)}
             </Text>
