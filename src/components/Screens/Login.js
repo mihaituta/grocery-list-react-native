@@ -2,8 +2,8 @@ import { useLayoutEffect, useState } from 'react'
 import { UserAuth } from '../Auth/AuthContext'
 import AuthForm from '../Auth/AuthForm'
 const Login = ({ navigation }) => {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('demo@gmail.com')
+  const [password, setPassword] = useState('123123')
   const [error, setError] = useState('')
   const { login } = UserAuth()
 
@@ -14,7 +14,7 @@ const Login = ({ navigation }) => {
   }, [])
 
   const handleSubmit = async () => {
-    console.log('password', password)
+    console.log('login')
     setError('')
     try {
       await login(email, password)
@@ -39,11 +39,9 @@ const Login = ({ navigation }) => {
       password={password}
       setPassword={setPassword}
       error={error}
+      setError={setError}
     />
   )
 }
-
-import { Button } from 'react-native'
-import { StatusBar } from 'expo-status-bar'
 
 export default Login

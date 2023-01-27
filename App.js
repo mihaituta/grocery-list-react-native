@@ -1,8 +1,9 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { DefaultTheme, NavigationContainer } from '@react-navigation/native'
 import { createNativeStackNavigator } from '@react-navigation/native-stack'
+import { navigationRef } from './src/components/Auth/RootNavigation'
 import Home from './src/components/Screens/Home'
-import Lists from './src/components/Screens/Lists'
+import List from './src/components/Screens/List'
 import Login from './src/components/Screens/Login'
 import Register from './src/components/Screens/Register'
 import {
@@ -11,26 +12,57 @@ import {
 } from './src/components/Auth/AuthContext'
 
 import { StatusBar } from 'expo-status-bar'
+import { ListsContextProvider } from './src/components/List/ListsContextProvider'
+import * as SplashScreen from 'expo-splash-screen'
 
 function AppContent() {
   const Stack = createNativeStackNavigator()
   const navTheme = DefaultTheme
   navTheme.colors.background = '#18181B'
   navTheme.colors.text = '#fff'
-  const { user } = UserAuth()
+  const { user, userIsLoading } = UserAuth()
+
+  const options = {
+    headerShown: false,
+    presentation: 'modal',
+    animationTypeForReplace: 'push',
+    animation: 'slide_from_right',
+  }
+
+  if (userIsLoading) {
+    return
+  }
 
   return (
-    <NavigationContainer theme={navTheme}>
+    <NavigationContainer ref={navigationRef} theme={navTheme}>
       <Stack.Navigator>
         {user ? (
           <>
-            <Stack.Screen name='Home' component={Home} />
-            <Stack.Screen name='Lists' component={Lists} />
+            <Stack.Screen
+              name='Home'
+              component={Home}
+              options={options}
+              initialParams={{ urlId: '' }}
+            />
+            <Stack.Screen name='List' component={List} options={options} />
           </>
         ) : (
           <>
-            <Stack.Screen name='Login' component={Login} />
-            <Stack.Screen name='Register' component={Register} />
+            <Stack.Screen
+              name='Login'
+              component={Login}
+              options={{
+                headerShown: false,
+                presentation: 'modal',
+                animationTypeForReplace: 'push',
+                animation: 'slide_from_left',
+              }}
+            />
+            <Stack.Screen
+              name='Register'
+              component={Register}
+              options={options}
+            />
           </>
         )}
       </Stack.Navigator>
@@ -40,9 +72,11 @@ function AppContent() {
 
 export default function App() {
   return (
-    <AuthContextProvider>
-      <AppContent />
-      <StatusBar style='light' />
-    </AuthContextProvider>
+    <ListsContextProvider>
+      <AuthContextProvider>
+        <AppContent />
+        <StatusBar style='light' />
+      </AuthContextProvider>
+    </ListsContextProvider>
   )
 }

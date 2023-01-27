@@ -1,7 +1,6 @@
 import { useLayoutEffect, useState } from 'react'
 import { UserAuth } from '../Auth/AuthContext'
 import AuthForm from '../Auth/AuthForm'
-import { Button } from 'react-native'
 
 const Register = ({ navigation }) => {
   const [email, setEmail] = useState('')
@@ -16,6 +15,7 @@ const Register = ({ navigation }) => {
   }, [])
 
   const handleSubmit = async () => {
+    console.log('register')
     setError('')
     try {
       await createUser(email, password)
@@ -38,6 +38,7 @@ const Register = ({ navigation }) => {
       password={password}
       setPassword={setPassword}
       error={error}
+      setError={setError}
     />
   )
 }

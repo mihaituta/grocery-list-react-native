@@ -4,11 +4,13 @@ import {
   EyeSlashIcon,
   LockClosedIcon,
 } from '@heroicons/react/20/solid'
-import { useState } from 'react'
+import React, { useState } from 'react'
 import {
   Button,
   Pressable,
+  RefreshControl,
   SafeAreaView,
+  ScrollView,
   Text,
   TextInput,
   View,
@@ -24,105 +26,226 @@ const AuthForm = ({
   password,
   setPassword,
   error,
+  setError,
 }) => {
   const [showPass, setShowPass] = useState(false)
+  const [isEmailEmpty, setIsEmailEmpty] = useState(false)
+  const [isEmailValid, setIsEmailValid] = useState(true)
+  const [isPassEmpty, setIsPassEmpty] = useState(false)
+
+  const validateInputs = () => {
+    if (!email.trim()) setIsEmailEmpty(true)
+    if (email.includes('@')) setIsEmailValid(true)
+
+    if (!password.trim()) setIsPassEmpty(true)
+
+    //if neither email nor password are empty and email is valid proceed to submit
+    if (email.trim() && password.trim() && email.includes('@')) handleSubmit()
+  }
+
+  const errorHandler = (error) => {
+    return (
+      <>
+        {error && (
+          <View className='flex flex-row items-center'>
+            <FontAwesome
+              name='exclamation-circle'
+              size={18}
+              color={`rgb(239, 68, 68)`}
+            />
+            <Text className='ml-2 text-red-500 font-bold text-base'>
+              {error}
+            </Text>
+          </View>
+        )}
+      </>
+    )
+  }
+
+  const [refreshing, setRefreshing] = React.useState(false)
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true)
+    setEmail('')
+    setPassword('')
+    setError('')
+    setIsEmailEmpty(false)
+    setIsEmailValid(true)
+    setIsPassEmpty(false)
+    setTimeout(() => {
+      setRefreshing(false)
+    }, 2000)
+  }, [])
 
   return (
-    <SafeAreaView className=' min-h-full bg-zinc-800 p-4'>
-      {/*APP TITLE*/}
-      <Text className='text-4xl text-white font-bold my-10 text-center'>
-        Grocery List
-      </Text>
-      {/*REGISTER/LOGIN TITLE*/}
-      <Text className='text-3xl text-white font-bold py-2'>
-        {loginForm ? 'Login' : 'Register'}
-      </Text>
-
-      <Text className='py-2 text-xl text-white font-medium'>Email address</Text>
-      <View className='relative py-2'>
-        <TextInput
-          className='border-0 focus:ring-amber-300 text-white text-lg bg-zinc-700 p-3 w-full pl-12'
-          placeholderTextColor='gray'
-          keyboardType='email-address'
-          textContentType='emailAddress'
-          placeholder='Email'
-          autoCapitalize='none'
-          autoComplete='email'
-          cursorColor='yellow'
-          value={email}
-          onChangeText={(text) => setEmail(text)}
-        />
-        <View className='inset-y-0 flex absolute left-3.5 justify-center'>
-          <FontAwesome name='envelope' size={22} color={'rgb(252, 211, 77)'} />
-          {/*<EnvelopeIcon className='h-6 w-6' />*/}
-        </View>
-      </View>
-
-      <Text className='py-2 text-xl text-white font-medium'>Password</Text>
-      <View className='relative py-2'>
-        <TextInput
-          className='border-0 focus:ring-amber-300 text-white text-lg bg-zinc-700 p-3 w-full pl-12'
-          placeholderTextColor='gray'
-          secureTextEntry={!showPass}
-          placeholder='Password'
-          autoCapitalize='none'
-          cursorColor='yellow'
-          value={password}
-          onChangeText={(text) => setPassword(text)}
-        />
-        <View className='inset-y-0 absolute left-4 flex justify-center items-center'>
-          <FontAwesome name='lock' size={26} color={'rgb(252, 211, 77)'} />
-        </View>
-        {/*SHOW/HIDE PASSWORD BUTTON*/}
-        <Pressable
-          className='inset-y-0 flex absolute right-3 justify-center'
-          onPress={() => {
-            setShowPass(!showPass)
-          }}
-        >
-          {showPass ? (
-            <FontAwesome name='eye' size={24} color={'rgb(252, 211, 77)'} />
-          ) : (
-            <FontAwesome
-              name='eye-slash'
-              size={24}
-              color={'rgb(252, 211, 77)'}
-            />
-          )}
-        </Pressable>
-      </View>
-
-      {/*REDIRECT LINK*/}
-      <Text className='py-2 text-lg text-white  '>
-        {loginForm
-          ? "Don't have an account yet? "
-          : 'Already have an account? '}
-        <Text
-          className='py-2 text-lg text-white underline'
-          onPress={() => {
-            navigation.navigate(loginForm ? 'Register' : 'Login')
-          }}
-        >
-          {loginForm ? 'Register' : 'Login'}
-        </Text>
-      </Text>
-
-      {/*ERROR*/}
-      {error && (
-        <Text className='text-red-400 font-bold text-lg mb-2'>{error}</Text>
-      )}
-
-      {/*SUBMIT BUTTON*/}
-      <Pressable
-        onPress={() => {
-          handleSubmit()
-        }}
-        className='border-0 bg-yellow-400/90 hover:bg-yellow-400 w-full p-4 my-5 flex items-center'
+    <SafeAreaView className='min-h-full bg-zinc-800 p-4'>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            progressBackgroundColor={'#18181B'}
+            colors={['rgb(252, 211, 77)']}
+            progressViewOffset={20}
+            refreshing={refreshing}
+            onRefresh={onRefresh}
+          />
+        }
       >
-        <Text className='text-white text-xl font-bold'>
+        {/*APP TITLE*/}
+        <Text className='text-4xl text-white font-bold mt-20 mb-12 text-center'>
+          Grocery List
+        </Text>
+
+        {/*ERROR*/}
+        {error && (
+          <View className='flex flex-row items-center justify-center mb-5 bg-red-500 py-3'>
+            <FontAwesome
+              name='exclamation-triangle'
+              size={24}
+              color={'white'}
+            />
+            <Text className='ml-2 text-white font-bold text-xl'>{error}</Text>
+          </View>
+        )}
+
+        {/*REGISTER/LOGIN TITLE*/}
+        <Text className='text-3xl text-white font-bold py-2'>
           {loginForm ? 'Login' : 'Register'}
         </Text>
-      </Pressable>
+
+        {/*EMAIL INPUT*/}
+        <Text className='py-2 text-xl text-white font-medium'>
+          Email address
+        </Text>
+        <View className='relative py-2'>
+          <TextInput
+            className={`border-0 focus:ring-amber-300 text-white text-lg bg-zinc-700 p-3 w-full pl-12 ${
+              isEmailEmpty || !isEmailValid
+                ? 'border-2 border-red-500'
+                : 'border-0'
+            }`}
+            placeholderTextColor='gray'
+            keyboardType='email-address'
+            textContentType='emailAddress'
+            placeholder='Email'
+            autoCapitalize='none'
+            autoComplete='email'
+            cursorColor='yellow'
+            value={email}
+            onChangeText={(value) => {
+              setEmail(value)
+              setError('')
+              value.trim() ? setIsEmailEmpty(false) : setIsEmailEmpty(true)
+              // email has to be a correct email
+              const regex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/
+              regex.test(value.trim())
+                ? setIsEmailValid(true)
+                : setIsEmailValid(false)
+            }}
+          />
+
+          {/*EMAIL ICON*/}
+          <View className='inset-y-0 flex absolute left-3.5 justify-center'>
+            <FontAwesome
+              name='envelope'
+              size={22}
+              color={
+                isEmailEmpty || !isEmailValid
+                  ? 'rgb(239, 68, 68)'
+                  : 'rgb(252, 211, 77)'
+              }
+            />
+          </View>
+        </View>
+
+        {/*EMAIL EMPTY ERROR*/}
+        {errorHandler(
+          isEmailEmpty
+            ? 'Email field cannot be empty!'
+            : !isEmailValid
+            ? 'Incorrect email address format!'
+            : ''
+        )}
+
+        {/*PASSWORD INPUT*/}
+        <Text className='py-2 text-xl text-white font-medium'>Password</Text>
+        <View className='relative py-2'>
+          <TextInput
+            className={`border-0 focus:ring-amber-300 text-white text-lg bg-zinc-700
+           p-3 w-full pl-12 ${
+             isPassEmpty ? 'border-2 border-red-500' : 'border-0'
+           }`}
+            placeholderTextColor='grey'
+            secureTextEntry={!showPass}
+            placeholder='Password'
+            autoCapitalize='none'
+            cursorColor='yellow'
+            value={password}
+            onChangeText={(value) => {
+              setPassword(value)
+              setError('')
+              value.trim() ? setIsPassEmpty(false) : setIsPassEmpty(true)
+            }}
+          />
+          {/*PASSWORD ICON*/}
+          <View className='inset-y-0 absolute left-4 flex justify-center items-center'>
+            <FontAwesome
+              name='lock'
+              size={26}
+              color={isPassEmpty ? 'rgb(239, 68, 68)' : 'rgb(252, 211, 77)'}
+            />
+          </View>
+          {/*SHOW/HIDE PASSWORD BUTTON*/}
+          <Pressable
+            className='inset-y-0 flex absolute right-3 justify-center'
+            onPress={() => {
+              setShowPass(!showPass)
+            }}
+          >
+            {showPass ? (
+              <FontAwesome
+                name='eye'
+                size={24}
+                color={isPassEmpty ? 'rgb(239, 68, 68)' : 'rgb(252, 211, 77)'}
+              />
+            ) : (
+              <FontAwesome
+                name='eye-slash'
+                size={24}
+                color={isPassEmpty ? 'rgb(239, 68, 68)' : 'rgb(252, 211, 77)'}
+              />
+            )}
+          </Pressable>
+        </View>
+        {/*PASSWORD EMPTY ERROR*/}
+        {errorHandler(isPassEmpty ? 'Password field cannot be empty!' : '')}
+
+        {/*REDIRECT LINK*/}
+        <Text className='py-2 text-lg text-white'>
+          {loginForm
+            ? "Don't have an account yet? "
+            : 'Already have an account? '}
+          <Text
+            className='py-2 text-lg text-white underline'
+            onPress={() => {
+              navigation.navigate(loginForm ? 'Register' : 'Login')
+            }}
+          >
+            {loginForm ? 'Register' : 'Login'}
+          </Text>
+        </Text>
+
+        {/*SUBMIT BUTTON*/}
+        <Pressable
+          android_ripple={{ color: `rgb(253, 224, 71)` }}
+          onPress={() => {
+            validateInputs()
+          }}
+          className='border-0 bg-yellow-400/90 w-full p-4 my-3 flex items-center'
+        >
+          <Text className='text-white text-xl font-bold'>
+            {loginForm ? 'Login' : 'Register'}
+          </Text>
+        </Pressable>
+      </ScrollView>
     </SafeAreaView>
   )
 }

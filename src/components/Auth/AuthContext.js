@@ -6,13 +6,15 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth'
 import { fbAuth, fbDB, setDoc, doc } from '../../store/firebase'
-// import { ListsContext } from '../../store/ListsContextProvider'
+import { ListsContext } from '../List/ListsContextProvider'
 
 const UserContext = createContext()
 
 export const AuthContextProvider = ({ children }) => {
   const [user, setUser] = useState(null)
-  // const listsCtx = useContext(ListsContext)
+  const [userIsLoading, setUserIsLoading] = useState(true)
+
+  const listsCtx = useContext(ListsContext)
 
   const createUser = (email, password) => {
     return createUserWithEmailAndPassword(fbAuth, email, password).then(
@@ -36,21 +38,22 @@ export const AuthContextProvider = ({ children }) => {
   }
 
   const logout = async () => {
-    // listsCtx.unsubscribeListsListener()
-    // listsCtx.unsubscribeUserListener()
-    // listsCtx.clearData()
+    listsCtx.unsubscribeListsListener()
+    listsCtx.unsubscribeUserListener()
+    listsCtx.clearData()
     return await signOut(fbAuth)
   }
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(fbAuth, (currentUser) => {
-      console.log('user')
       setUser(currentUser)
+      setUserIsLoading(false)
+
       if (currentUser) {
         try {
-          // listsCtx.setUserListener()
-          // listsCtx.setListsListener()
-          // listsCtx.getLists()
+          listsCtx.setUserListener()
+          listsCtx.setListsListener()
+          listsCtx.getLists()
         } catch (e) {
           console.log(e)
         }
@@ -62,7 +65,9 @@ export const AuthContextProvider = ({ children }) => {
   }, [])
 
   return (
-    <UserContext.Provider value={{ createUser, user, logout, login }}>
+    <UserContext.Provider
+      value={{ createUser, user, userIsLoading, logout, login }}
+    >
       {children}
     </UserContext.Provider>
   )
