@@ -1,19 +1,9 @@
-import {
-  ActivityIndicator,
-  FlatList,
-  Pressable,
-  RefreshControl,
-  Text,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import React, { useContext, useEffect } from 'react'
+import { ActivityIndicator, RefreshControl, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
-import React, { useContext, useEffect, useRef, useState } from 'react'
 import Header from '../Layout/Header'
 import { ListsContext } from '../List/ListsContextProvider'
 import BouncyCheckbox from 'react-native-bouncy-checkbox'
-import RNBounceable from '@freakycoder/react-native-bounceable'
-
 import FontAwesome from '@expo/vector-icons/FontAwesome'
 import { FontAwesome5 } from '@expo/vector-icons'
 import DraggableFlatList, {
@@ -28,7 +18,6 @@ const List = ({ navigation, route }) => {
   const loadingLists = listsCtx.loadingLists
   const urlId = route.params.urlId
   const [refreshing, setRefreshing] = React.useState(false)
-  const CheckboxRefs = useRef([])
 
   const deleteList = () => {
     listsCtx.deleteList(currentList.id)
@@ -45,6 +34,7 @@ const List = ({ navigation, route }) => {
   useEffect(() => {
     listsCtx.setCurrentList({ urlId })
   }, [urlId])
+
   const onRefresh = React.useCallback(() => {
     setRefreshing(true)
     navigation.navigate('List', { urlId })
@@ -54,6 +44,16 @@ const List = ({ navigation, route }) => {
       setRefreshing(false)
     }, 2000)
   }, [])
+
+  const deleteFoodItemHandler = (foodItem) => {
+    listsCtx.deleteFoodItem(foodItem)
+  }
+
+  const foodItemCheckHandler = (index) => {
+    let checkbox = foodItems[index]
+    checkbox.checked = !checkbox.checked
+    listsCtx.updateList({ foodItems, listId: currentList.id })
+  }
 
   const emptyComponent = () => {
     return loadingLists ? (
@@ -74,30 +74,17 @@ const List = ({ navigation, route }) => {
     )
   }
 
-  const deleteFoodItemHandler = (foodItem) => {
-    listsCtx.deleteFoodItem(foodItem)
-  }
-
-  const foodItemCheckHandler = (index) => {
-    let checkbox = foodItems[index]
-
-    checkbox.checked = !checkbox.checked
-
-    listsCtx.updateList({ foodItems, listId: currentList.id })
-  }
-
   const handleOnDragEnd = (result) => {
-    const [reorderedItem] = foodItems.splice(result.source.index, 1)
-    foodItems.splice(result.destination.index, 0, reorderedItem)
-
-    listsCtx.updateList({ foodItems, listId: currentList.id })
+    /*    const [reorderedItem] = foodItems.splice(result.from, 1)
+    foodItems.splice(result.to, 0, reorderedItem)*/
+    listsCtx.updateList({ foodItems: result.data, listId: currentList.id })
   }
 
   const renderItem = ({ item, getIndex, isActive, drag }) => {
     const index = getIndex()
     return (
       <ScaleDecorator>
-        <Pressable
+        <View
           disabled={isActive}
           // px-4  py-3.5
           className={`bg-zinc-800 mb-2 mx-2 rounded flex flex-row
@@ -112,8 +99,8 @@ const List = ({ navigation, route }) => {
             shadowRadius: 2.22,
             elevation: 3,
           }}
-          onPress={() => CheckboxRefs.current[index]?.onPress()}
         >
+          {/*CHECKBOX*/}
           <BouncyCheckbox
             fillColor={'rgb(252, 211, 77)'}
             textStyle={{
@@ -134,7 +121,6 @@ const List = ({ navigation, route }) => {
                 ''
               )
             }
-            ref={(el) => (CheckboxRefs.current[index] = el)}
             onPress={() => foodItemCheckHandler(index)}
             isChecked={item.checked}
             disableBuiltInState
@@ -152,7 +138,6 @@ const List = ({ navigation, route }) => {
               color='rgb(252, 211, 77)'
               onPress={() => deleteFoodItemHandler(item)}
             />
-            {/*<FontAwesome5 name='trash' size={20} color='rgb(252, 211, 77)' />*/}
 
             {/*DRAG ICON REORDER*/}
             <FontAwesome
@@ -163,7 +148,7 @@ const List = ({ navigation, route }) => {
               color='rgb(113, 113, 122)'
             />
           </View>
-        </Pressable>
+        </View>
       </ScaleDecorator>
     )
   }
@@ -171,13 +156,15 @@ const List = ({ navigation, route }) => {
   return (
     <>
       <StatusBar style='light' />
-      <GestureHandlerRootView style={{ flex: 1 }}>
+
+      <GestureHandlerRootView>
         <DraggableFlatList
           data={foodItems}
-          // onDragEnd={handleOnDragEnd}
+          onDragEnd={handleOnDragEnd}
           keyExtractor={(item) => item.id}
           renderItem={(item) => renderItem(item)}
           stickyHeaderIndices={[0]}
+          autoscrollThreshold={250}
           ListHeaderComponent={
             <Header
               buttonText='Delete list'
@@ -185,7 +172,7 @@ const List = ({ navigation, route }) => {
               listPage={true}
               navigation={navigation}
             >
-              {/*   <Pressable
+              {/* <Pressable
                 android_ripple
                 className='border border-amber-300 px-3 h-10 text-lg w-24 justify-center
                 text-amber-300 flex flex-row items-center'
@@ -196,17 +183,18 @@ const List = ({ navigation, route }) => {
                 >
                   Add list
                 </Text>
-              </Pressable>*/}
-              {/*INPUT ADD ITEM*/}
-              {/*      <AddFoodItem
+              </Pressable>
+              INPUT ADD ITEM
+              <AddFoodItem
                 listPage={true}
                 listsCtx={listsCtx}
                 foodItems={foodItems}
                 currentList={currentList}
-            />
-            <ProgressBar foodItems={foodItems} />*/}
+              />
+              <ProgressBar foodItems={foodItems} />*/}
             </Header>
           }
+          ListEmptyComponent={emptyComponent}
           refreshControl={
             <RefreshControl
               progressBackgroundColor={'#18181B'}
@@ -216,9 +204,6 @@ const List = ({ navigation, route }) => {
               onRefresh={onRefresh}
             />
           }
-          // className='flex-1'
-          ListEmptyComponent={emptyComponent}
-          // ItemSeparatorComponent={() => <View style={{ height: 5 }} />}
         />
       </GestureHandlerRootView>
     </>

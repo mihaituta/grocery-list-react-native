@@ -292,7 +292,6 @@ export const ListsContextProvider = ({ children }) => {
               // can't go back on the page after it has been deleted and redirected to home
               // navigate('/', { replace: true })
               RootNavigation.navigate('Home')
-
               dispatchListsAction({ type: 'DELETE_LIST', payload: id })
             }
           })

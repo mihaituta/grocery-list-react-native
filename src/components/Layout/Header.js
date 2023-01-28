@@ -20,7 +20,7 @@ const Header = ({
   const { user } = UserAuth()
   return (
     <View
-      className='bg-zinc-800 p-4 mb-2.5 pt-10'
+      className='bg-zinc-800 p-4 pt-10 z-10 mb-2'
       style={{
         shadowColor: 'rgb(0, 0, 0)',
         shadowOffset: {

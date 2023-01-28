@@ -16,7 +16,6 @@ import { ListsContext } from '../List/ListsContextProvider'
 
 const Home = ({ navigation }) => {
   const { logout } = UserAuth()
-  const { user } = UserAuth()
   const listsCtx = useContext(ListsContext)
   const loadingLists = listsCtx.loadingLists
 
@@ -109,7 +108,7 @@ const Home = ({ navigation }) => {
         renderItem={(list) => (
           <Pressable
             android_ripple={{ color: `rgb(252, 211, 77)` }}
-            className={`h-28 flex-1 max-w-[43%] my-2.5  ${
+            className={`h-28 flex-1 max-w-[43%] my-2.5   ${
               list.index % 2 === 0 ? 'mr-2.5 ml-4' : 'ml-2.5 mr-4'
             } bg-zinc-800 rounded list-none relative`}
             style={{
@@ -126,7 +125,7 @@ const Home = ({ navigation }) => {
             onPress={() => listRedirect(list.item)}
           >
             {/*ITEMS PREVIEW*/}
-            <View className='text-neutral-400 px-2 py-1 h-4/6 mr-2'>
+            <View className='text-neutral-400 px-2 py-1 h-4/6 mr-2 overflow-hidden overflow-ellipsis'>
               {list.item.foodItems &&
                 list.item.foodItems.map((item, index) => (
                   <BouncyCheckbox
