@@ -1,12 +1,5 @@
 import React from 'react'
-import {
-  Button,
-  Pressable,
-  Text,
-  TouchableHighlight,
-  TouchableOpacity,
-  View,
-} from 'react-native'
+import { Pressable, Text, View } from 'react-native'
 import { UserAuth } from '../Auth/AuthContext'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 
@@ -18,6 +11,7 @@ const Header = ({
   buttonFunction,
 }) => {
   const { user } = UserAuth()
+
   return (
     <View
       className='bg-zinc-800 p-4 pt-10 z-10 mb-2'
@@ -33,6 +27,7 @@ const Header = ({
         elevation: 7,
       }}
     >
+      {/*BACK BUTTON*/}
       {listPage && (
         <Pressable
           android_ripple={{ color: `rgb(252, 211, 77)` }}
@@ -56,6 +51,7 @@ const Header = ({
           </Text>
         </Pressable>
       )}
+
       <View className='flex flex-row mt-2 mb-3 justify-between'>
         <View>
           <Text className='text-white text-3xl font-semibold'>
@@ -66,6 +62,7 @@ const Header = ({
           </Text>
         </View>
 
+        {/*BUTTON LOGOUT (Home page) / DELETE LIST*/}
         <Pressable
           android_ripple={{ color: `rgb(252, 211, 77)` }}
           className='border border-amber-300 px-3 h-10 text-lg text-amber-300 flex flex-row items-center'

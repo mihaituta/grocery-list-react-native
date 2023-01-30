@@ -211,7 +211,7 @@ export const ListsContextProvider = ({ children }) => {
   const addFoodItemHandler = async (item) => {
     const userId = fbAuth.currentUser.uid
     const listsQuery = doc(fbDB, `users/${userId}/lists`, state.currentList.id)
-
+    console.log('item', item)
     try {
       await updateDoc(
         listsQuery,

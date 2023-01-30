@@ -1,15 +1,12 @@
 import React, { useContext, useEffect } from 'react'
-import { ActivityIndicator, RefreshControl, Text, View } from 'react-native'
+import { ActivityIndicator, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import Header from '../Layout/Header'
 import { ListsContext } from '../List/ListsContextProvider'
-import BouncyCheckbox from 'react-native-bouncy-checkbox'
-import FontAwesome from '@expo/vector-icons/FontAwesome'
-import { FontAwesome5 } from '@expo/vector-icons'
-import DraggableFlatList, {
-  ScaleDecorator,
-} from 'react-native-draggable-flatlist'
+import DraggableFlatList from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
+import FoodItem from '../List/FoodItem'
+import AddFoodItem from '../List/AddFoodItem'
 
 const List = ({ navigation, route }) => {
   const listsCtx = useContext(ListsContext)
@@ -17,44 +14,25 @@ const List = ({ navigation, route }) => {
   const foodItems = listsCtx.currentList.foodItems
   const loadingLists = listsCtx.loadingLists
   const urlId = route.params.urlId
-  const [refreshing, setRefreshing] = React.useState(false)
+
+  // clear the current list when leaving the list page
+  useEffect(() => {
+    return () => {
+      listsCtx.setCurrentList({ list: {} })
+    }
+  }, [])
+
+  // sets the current list from params
+  useEffect(() => {
+    listsCtx.setCurrentList({ urlId })
+  }, [urlId])
 
   const deleteList = () => {
     listsCtx.deleteList(currentList.id)
     navigation.navigate('Home')
   }
 
-  useEffect(() => {
-    return () => {
-      // clear the current list when leaving the list page
-      listsCtx.setCurrentList({ list: {} })
-    }
-  }, [])
-
-  useEffect(() => {
-    listsCtx.setCurrentList({ urlId })
-  }, [urlId])
-
-  const onRefresh = React.useCallback(() => {
-    setRefreshing(true)
-    navigation.navigate('List', { urlId })
-    listsCtx.getLists()
-
-    setTimeout(() => {
-      setRefreshing(false)
-    }, 2000)
-  }, [])
-
-  const deleteFoodItemHandler = (foodItem) => {
-    listsCtx.deleteFoodItem(foodItem)
-  }
-
-  const foodItemCheckHandler = (index) => {
-    let checkbox = foodItems[index]
-    checkbox.checked = !checkbox.checked
-    listsCtx.updateList({ foodItems, listId: currentList.id })
-  }
-
+  // to display when lists are retrieved from the API or the list has no food items
   const emptyComponent = () => {
     return loadingLists ? (
       <View className='flex items-center justify-center mt-6'>
@@ -74,97 +52,28 @@ const List = ({ navigation, route }) => {
     )
   }
 
-  const handleOnDragEnd = (result) => {
-    /*    const [reorderedItem] = foodItems.splice(result.from, 1)
-    foodItems.splice(result.to, 0, reorderedItem)*/
-    listsCtx.updateList({ foodItems: result.data, listId: currentList.id })
-  }
-
-  const renderItem = ({ item, getIndex, isActive, drag }) => {
-    const index = getIndex()
-    return (
-      <ScaleDecorator>
-        <View
-          disabled={isActive}
-          // px-4  py-3.5
-          className={`bg-zinc-800 mb-2 mx-2 rounded flex flex-row
-            cursor-pointer justify-between items-center`}
-          style={{
-            shadowColor: 'rgb(0, 0, 0)',
-            shadowOffset: {
-              width: 0,
-              height: 1,
-            },
-            shadowOpacity: 0.22,
-            shadowRadius: 2.22,
-            elevation: 3,
-          }}
-        >
-          {/*CHECKBOX*/}
-          <BouncyCheckbox
-            fillColor={'rgb(252, 211, 77)'}
-            textStyle={{
-              textDecorationLine: 'none',
-              color: 'white',
-              fontSize: 18,
-            }}
-            style={{ paddingLeft: 15, paddingVertical: 15, width: '70%' }}
-            innerIconStyle={{ borderWidth: 2 }}
-            // text-xl text-white flex break-words items-center
-            textContainerStyle={{
-              marginLeft: 15,
-            }}
-            iconComponent={
-              item.checked ? (
-                <FontAwesome name='check' size={17} color='white' />
-              ) : (
-                ''
-              )
-            }
-            onPress={() => foodItemCheckHandler(index)}
-            isChecked={item.checked}
-            disableBuiltInState
-            size={25}
-            key={item.id}
-            text={item.name}
-          />
-
-          <View className='flex flex-row'>
-            {/*DELETE ITEM ICON*/}
-            <FontAwesome
-              style={{ paddingLeft: 20, paddingRight: 10, paddingVertical: 15 }}
-              name='trash'
-              size={23}
-              color='rgb(252, 211, 77)'
-              onPress={() => deleteFoodItemHandler(item)}
-            />
-
-            {/*DRAG ICON REORDER*/}
-            <FontAwesome
-              style={{ paddingLeft: 15, paddingRight: 20, paddingVertical: 15 }}
-              onLongPress={drag}
-              name='reorder'
-              size={24}
-              color='rgb(113, 113, 122)'
-            />
-          </View>
-        </View>
-      </ScaleDecorator>
-    )
-  }
+  const handleOnDragEnd = (reorderedList) =>
+    listsCtx.updateList({
+      foodItems: reorderedList.data,
+      listId: currentList.id,
+    })
 
   return (
     <>
       <StatusBar style='light' />
-
       <GestureHandlerRootView>
         <DraggableFlatList
+          // keyboardShouldPersistTaps='handled'
+          keyboardShouldPersistTaps='always'
+          keyboardDismissMode='on-drag'
           data={foodItems}
           onDragEnd={handleOnDragEnd}
           keyExtractor={(item) => item.id}
-          renderItem={(item) => renderItem(item)}
+          renderItem={(item) =>
+            FoodItem(item, listsCtx, foodItems, currentList)
+          }
           stickyHeaderIndices={[0]}
-          autoscrollThreshold={250}
+          autoscrollThreshold={200}
           ListHeaderComponent={
             <Header
               buttonText='Delete list'
@@ -172,18 +81,14 @@ const List = ({ navigation, route }) => {
               listPage={true}
               navigation={navigation}
             >
-              {/* <Pressable
-                android_ripple
-                className='border border-amber-300 px-3 h-10 text-lg w-24 justify-center
-                text-amber-300 flex flex-row items-center'
-              >
-                <Text
-                  className='text-lg text-amber-300'
-                  onPress={listsCtx.addList}
-                >
-                  Add list
-                </Text>
-              </Pressable>
+              {/*INPUT ADD ITEM*/}
+              <AddFoodItem
+                listPage={true}
+                listsCtx={listsCtx}
+                foodItems={foodItems}
+                currentList={currentList}
+              />
+              {/*
               INPUT ADD ITEM
               <AddFoodItem
                 listPage={true}
@@ -195,15 +100,6 @@ const List = ({ navigation, route }) => {
             </Header>
           }
           ListEmptyComponent={emptyComponent}
-          refreshControl={
-            <RefreshControl
-              progressBackgroundColor={'#18181B'}
-              colors={['rgb(252, 211, 77)']}
-              progressViewOffset={20}
-              refreshing={refreshing}
-              onRefresh={onRefresh}
-            />
-          }
         />
       </GestureHandlerRootView>
     </>
