@@ -11,7 +11,7 @@ import { StatusBar } from 'expo-status-bar'
 import React, { useContext } from 'react'
 import Header from '../Layout/Header'
 import { UserAuth } from '../Auth/AuthContext'
-import { ListsContext } from '../List/ListsContextProvider'
+import { ListsContext } from '../../store/ListsContextProvider'
 import ListItem from '../List/ListItem'
 
 const Home = ({ navigation }) => {

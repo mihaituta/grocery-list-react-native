@@ -2,11 +2,12 @@ import React, { useContext, useEffect } from 'react'
 import { ActivityIndicator, Text, View } from 'react-native'
 import { StatusBar } from 'expo-status-bar'
 import Header from '../Layout/Header'
-import { ListsContext } from '../List/ListsContextProvider'
+import { ListsContext } from '../../store/ListsContextProvider'
 import DraggableFlatList from 'react-native-draggable-flatlist'
 import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import FoodItem from '../List/FoodItem'
 import AddFoodItem from '../List/AddFoodItem'
+import ProgressBar from '../List/ProgressBar'
 
 const List = ({ navigation, route }) => {
   const listsCtx = useContext(ListsContext)
@@ -63,7 +64,6 @@ const List = ({ navigation, route }) => {
       <StatusBar style='light' />
       <GestureHandlerRootView>
         <DraggableFlatList
-          // keyboardShouldPersistTaps='handled'
           keyboardShouldPersistTaps='always'
           keyboardDismissMode='on-drag'
           data={foodItems}
@@ -88,15 +88,7 @@ const List = ({ navigation, route }) => {
                 foodItems={foodItems}
                 currentList={currentList}
               />
-              {/*
-              INPUT ADD ITEM
-              <AddFoodItem
-                listPage={true}
-                listsCtx={listsCtx}
-                foodItems={foodItems}
-                currentList={currentList}
-              />
-              <ProgressBar foodItems={foodItems} />*/}
+              <ProgressBar foodItems={foodItems} />
             </Header>
           }
           ListEmptyComponent={emptyComponent}

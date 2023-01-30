@@ -12,7 +12,7 @@ import {
 } from './src/components/Auth/AuthContext'
 
 import { StatusBar } from 'expo-status-bar'
-import { ListsContextProvider } from './src/components/List/ListsContextProvider'
+import { ListsContextProvider } from './src/store/ListsContextProvider'
 
 function AppContent() {
   const Stack = createNativeStackNavigator()

@@ -15,10 +15,10 @@ import {
   arrayUnion,
   arrayRemove,
   setDoc,
-} from '../../store/firebase'
+} from './firebase'
 import ListReducer from './ListReducer'
-import * as RootNavigation from '../Auth/RootNavigation'
-import { currentRoute } from '../Auth/RootNavigation'
+import * as RootNavigation from '../components/Auth/RootNavigation'
+import { currentRoute } from '../components/Auth/RootNavigation'
 
 const initState = {
   lists: [],
@@ -211,7 +211,7 @@ export const ListsContextProvider = ({ children }) => {
   const addFoodItemHandler = async (item) => {
     const userId = fbAuth.currentUser.uid
     const listsQuery = doc(fbDB, `users/${userId}/lists`, state.currentList.id)
-    console.log('item', item)
+
     try {
       await updateDoc(
         listsQuery,

@@ -1,6 +1,7 @@
-import { useRef, useState } from 'react'
+import { useState } from 'react'
 import { TextInput, View } from 'react-native'
 import SavedFoodsChips from './SavedFoodsChips'
+import ListCheckedStatus from './ListCheckedStatus'
 
 const AddFoodItem = ({ listsCtx, listPage, foodItems, currentList }) => {
   const [itemName, setItemName] = useState('')
@@ -42,7 +43,7 @@ const AddFoodItem = ({ listsCtx, listPage, foodItems, currentList }) => {
   }
 
   return (
-    <View keyboardShouldPersistTaps={'handled'}>
+    <View>
       {itemName && (
         <SavedFoodsChips
           listPage={listPage}
@@ -51,19 +52,26 @@ const AddFoodItem = ({ listsCtx, listPage, foodItems, currentList }) => {
           addFoodItemHandler={addFoodItemHandler}
         />
       )}
-
-      <TextInput
-        value={itemName}
-        onChangeText={(value) => itemNameChangeHandler(value)}
-        blurOnSubmit={false}
-        onSubmitEditing={(e) => addFoodItemHandler(e)}
-        placeholderTextColor='gray'
-        placeholder='Add new item...'
-        cursorColor='yellow'
-        className='bg-neutral-900 text-white text-lg
+      <View className='flex flex-row items-center justify-between'>
+        <TextInput
+          value={itemName}
+          onChangeText={(value) => itemNameChangeHandler(value)}
+          blurOnSubmit={false}
+          onSubmitEditing={(e) => addFoodItemHandler(e)}
+          placeholderTextColor='gray'
+          placeholder='Add new item...'
+          cursorColor='yellow'
+          className='bg-neutral-900 text-white text-lg
              border-0 focus:ring-0 ring-0 rounded w-36 h-11 px-2'
-        returnKeyType='go'
-      />
+          returnKeyType='go'
+        />
+
+        <ListCheckedStatus
+          foodItems={foodItems}
+          currentList={currentList}
+          listsCtx={listsCtx}
+        />
+      </View>
     </View>
   )
 }

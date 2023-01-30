@@ -1,12 +1,5 @@
+import React, { useState, useRef } from 'react'
 import {
-  EnvelopeIcon,
-  EyeIcon,
-  EyeSlashIcon,
-  LockClosedIcon,
-} from '@heroicons/react/20/solid'
-import React, { useState } from 'react'
-import {
-  Button,
   Pressable,
   RefreshControl,
   SafeAreaView,
@@ -32,7 +25,8 @@ const AuthForm = ({
   const [isEmailEmpty, setIsEmailEmpty] = useState(false)
   const [isEmailValid, setIsEmailValid] = useState(true)
   const [isPassEmpty, setIsPassEmpty] = useState(false)
-
+  const emailInputRef = useRef()
+  const passInputRef = useRef()
   const validateInputs = () => {
     if (!email.trim()) setIsEmailEmpty(true)
     if (email.includes('@')) setIsEmailValid(true)
@@ -71,6 +65,9 @@ const AuthForm = ({
     setIsEmailEmpty(false)
     setIsEmailValid(true)
     setIsPassEmpty(false)
+    emailInputRef.current.blur()
+    passInputRef.current.blur()
+
     setTimeout(() => {
       setRefreshing(false)
     }, 2000)
@@ -79,6 +76,7 @@ const AuthForm = ({
   return (
     <SafeAreaView className='min-h-full bg-zinc-800 p-4'>
       <ScrollView
+        keyboardShouldPersistTaps='always'
         refreshControl={
           <RefreshControl
             progressBackgroundColor={'#18181B'}
@@ -117,11 +115,10 @@ const AuthForm = ({
         </Text>
         <View className='relative py-2'>
           <TextInput
-            className={`border-0 focus:ring-amber-300 text-white text-lg bg-zinc-700 p-3 w-full pl-12 ${
-              isEmailEmpty || !isEmailValid
-                ? 'border-2 border-red-500'
-                : 'border-0'
+            className={`focus:border-2 focus:border-amber-300 text-white text-lg bg-zinc-700 p-3 w-full pl-12 ${
+              isEmailEmpty || !isEmailValid ? 'border-2 border-red-500' : ''
             }`}
+            ref={emailInputRef}
             placeholderTextColor='gray'
             keyboardType='email-address'
             textContentType='emailAddress'
@@ -169,10 +166,9 @@ const AuthForm = ({
         <Text className='py-2 text-xl text-white font-medium'>Password</Text>
         <View className='relative py-2'>
           <TextInput
-            className={`border-0 focus:ring-amber-300 text-white text-lg bg-zinc-700
-           p-3 w-full pl-12 ${
-             isPassEmpty ? 'border-2 border-red-500' : 'border-0'
-           }`}
+            ref={passInputRef}
+            className={`focus:border-2 focus:border-amber-300 text-white text-lg bg-zinc-700
+           p-3 w-full pl-12 ${isPassEmpty ? 'border-2 border-red-500' : ''}`}
             placeholderTextColor='grey'
             secureTextEntry={!showPass}
             placeholder='Password'
@@ -195,7 +191,7 @@ const AuthForm = ({
           </View>
           {/*SHOW/HIDE PASSWORD BUTTON*/}
           <Pressable
-            className='inset-y-0 flex absolute right-3 justify-center'
+            className='inset-y-0 flex absolute right-0 justify-center px-3.5'
             onPress={() => {
               setShowPass(!showPass)
             }}

@@ -6,7 +6,7 @@ import {
   onAuthStateChanged,
 } from 'firebase/auth'
 import { fbAuth, fbDB, setDoc, doc } from '../../store/firebase'
-import { ListsContext } from '../List/ListsContextProvider'
+import { ListsContext } from '../../store/ListsContextProvider'
 
 const UserContext = createContext()
 
