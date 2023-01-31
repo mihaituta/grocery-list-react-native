@@ -88,6 +88,7 @@ const List = ({ navigation, route }) => {
                 foodItems={foodItems}
                 currentList={currentList}
               />
+              {/*PROGRESS BAR*/}
               <ProgressBar foodItems={foodItems} />
             </Header>
           }

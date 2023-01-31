@@ -45,7 +45,7 @@ const Header = ({
           <Text
             includeFontPadding={false}
             textAlignVertical={true}
-            className='text-2xl text-amber-300 ml-1  pb-[2px]'
+            className='text-2xl text-amber-300 ml-1 pb-[2px]'
           >
             Lists
           </Text>
